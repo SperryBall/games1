@@ -1,201 +1,139 @@
-<!DOCTYPE html>
-<html>
-<body>
-  
-	<head>
-		<title>► Snake Game</title>
-		<link rel="stylesheet" type="text/css" href="styles.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-	</head>
-  
-<canvas id="canvas" width="450" height="450">
-    
-    <script type="text/css">
-        
-        body {
-    background-color: #375;
-    }
-
-    #canvas {
-  display: block;
-  margin: 5px auto;
-  border: 10px solid #657;
-  
-  
-    }
-
-    </script>
-
-    <script type="text/javascript">
-        
-        $(document).ready(function(){
-    //Canvas stuff
-    var canvas = $("#canvas")[0];
-    var ctx = canvas.getContext("2d");
-    var w = $("#canvas").width();
-    var h = $("#canvas").height();
-    
-    //Lets save the cell width in a variable for easy control
-    var cw = 10;
-    var d;
-    var food;
-    var score;
-   var level;
-    
-    //Lets create the snake now
-    var snake_array; //an array of cells to make up the snake
-    
-    function init()
-    {
-        d = "right"; //default direction
-        create_snake();
-        create_food(); //Now we can see the food particle
-        //finally lets display the score
-        score = 0;
-     level = 1;
-        
-        //Lets move the snake now using a timer which will trigger the paint function
-        //every 60ms
-        if(typeof game_loop != "undefined") clearInterval(game_loop);
-        game_loop = setInterval(paint, 100);
-    }
-    init();
-    
-    function create_snake()
-    {
-        var length = 5; //Length of the snake
-        snake_array = []; //Empty array to start with
-        for(var i = length-1; i>=0; i--)
-        {
-            //This will create a horizontal snake starting from the top left
-            snake_array.push({x: i, y:0});
-        }
-    }
-    
-    //Lets create the food now
-    function create_food()
-    {
-        food = {
-            x: Math.round(Math.random()*(w-cw)/cw), 
-            y: Math.round(Math.random()*(h-cw)/cw), 
-        };
-        //This will create a cell with x/y between 0-44
-        //Because there are 45(450/10) positions accross the rows and columns
-    }
-    
-    //Lets paint the snake now
-    function paint()
-    {
-        //To avoid the snake trail we need to paint the BG on every frame
-        //Lets paint the canvas now
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, w, h);
-        ctx.strokeStyle = "black";
-        ctx.strokeRect(0, 0, w, h);
-        
-        //The movement code for the snake to come here.
-        //The logic is simple
-        //Pop out the tail cell and place it infront of the head cell
-        var nx = snake_array[0].x;
-        var ny = snake_array[0].y;
-        //These were the position of the head cell.
-        //We will increment it to get the new head position
-        //Lets add proper direction based movement now
-        if(d == "right") nx++;
-        else if(d == "left") nx--;
-        else if(d == "up") ny--;
-        else if(d == "down") ny++;
-        
-        //Lets add the game over clauses now
-        //This will restart the game if the snake hits the wall
-        //Lets add the code for body collision
-        //Now if the head of the snake bumps into its body, the game will restart
-        if(nx == -1 || nx == w/cw || ny == -1 || ny == h/cw || check_collision(nx, ny, snake_array))
-        {
-            //restart game
-            init();
-            //Lets organize the code a bit now.
-            return;
-        }
-        
-        //Lets write the code to make the snake eat the food
-        //The logic is simple
-        //If the new head position matches with that of the food,
-        //Create a new head instead of moving the tail
-        if(nx == food.x && ny == food.y)
-        {
-            var tail = {x: nx, y: ny};
-            score++;
-       
-            //Create new food
-            create_food();
-        }
-        else
-        {
-            var tail = snake_array.pop(); //pops out the last cell
-            tail.x = nx; tail.y = ny;
-        }
-        //The snake can now eat the food.
-        
-        snake_array.unshift(tail); //puts back the tail as the first cell
-        
-        for(var i = 0; i < snake_array.length; i++)
-        {
-            var c = snake_array[i];
-            //Lets paint 10px wide cells
-            paint_cell(c.x, c.y, "blue");
-        }
-        
-        //Lets paint the food
-        paint_cell(food.x, food.y, "red");
-        //Lets paint the score
-        var score_text = "Score: " + score;
-     var level_text = "Level: " + level;
-        ctx.fillText(score_text, 5, h-5);
-     ctx.fillText(level_text, 60, h-5);
-    }
-    
-    //Lets first create a generic function to paint cells
-    function paint_cell(x, y, color)
-    {
-        ctx.fillStyle = color;
-        ctx.fillRect(x*cw, y*cw, cw, cw);
-        ctx.strokeStyle = "white";
-        ctx.strokeRect(x*cw, y*cw, cw, cw);
-    }
-    
-    function check_collision(x, y, array)
-    {
-        //This function will check if the provided x/y coordinates exist
-        //in an array of cells or not
-        for(var i = 0; i < array.length; i++)
-        {
-            if(array[i].x == x && array[i].y == y)
-             return true;
-        }
-        return false;
-    }
-    
-    //Lets add the keyboard controls now
-    $(document).keydown(function(e){
-        var key = e.which;
-        //We will add another clause to prevent reverse gear
-        if(key == "37" && d != "right") d = "left";
-        else if(key == "38" && d != "down") d = "up";
-        else if(key == "39" && d != "left") d = "right";
-        else if(key == "40" && d != "up") d = "down";
-        //The snake is now keyboard controllable
-    })
-    
-    
-    
-    
-    
-    
-    
-})
-
-    </script>
-</canvas>
-</html>
+<!documentTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Play Snake Game</title>
+<style type="text/css">
+body {text-align:center;}
+canvas { border:5px dotted #ccc; }
+h1 { font-size:50px; text-align: center; margin: 0; padding-bottom: 25px;}
+</style>
+<script type="text/javascript">
+function play_game() 
+{
+var level = 160; // Game level, by decreasing will speed up
+var rect_w = 45; // Width 
+var rect_h = 30; // Height
+var inc_score = 50; // Score
+var snake_color = "#006699"; // Snake Color
+var ctx; // Canvas attributes
+var tn = []; // temp directions storage
+var x_dir = [-1, 0, 1, 0]; // position adjusments
+var y_dir = [0, -1, 0, 1]; // position adjusments
+var queue = []; 
+var frog = 1; // defalut food
+var map = [];
+var MR = Math.random; 
+var X = 5 + (MR() * (rect_w - 10))|0; // Calculate positions
+var Y = 5 + (MR() * (rect_h - 10))|0; // Calculate positions
+var direction = MR() * 3 | 0; 
+var interval = 0;
+var score = 0;
+var sum = 0, easy = 0;
+var i, dir;
+// getting play area 
+var c = document.getElementById('playArea');
+ctx = c.getContext('2d');
+// Map positions
+for (i = 0; i < rect_w; i++)
+{
+map[i] = [];
+}
+// random placement of snake food
+function rand_frog() 
+{
+var x, y;
+do 
+{
+x = MR() * rect_w|0;
+y = MR() * rect_h|0;
+} 
+while (map[x][y]);
+map[x][y] = 1;
+ctx.fillStyle = snake_color;
+ctx.strokeRect(x * 10+1, y * 10+1, 8, 8);
+}
+// Default somewhere placement 
+rand_frog();
+function set_game_speed() 
+{
+if (easy) 
+{
+X = (X+rect_w)%rect_w;
+Y = (Y+rect_h)%rect_h;
+}
+--inc_score;
+if (tn.length) 
+{
+dir = tn.pop();
+if ((dir % 2) !== (direction % 2)) 
+{
+direction = dir;
+}
+}
+if ((easy || (0 <= X && 0 <= Y && X < rect_w && Y < rect_h)) && 2 !== map[X][Y]) 
+{
+if (1 === map[X][Y]) 
+{
+score+= Math.max(5, inc_score);
+inc_score = 50;
+rand_frog();
+frog++;
+}
+//ctx.fillStyle("#ffffff");
+ctx.fillRect(X * 10, Y * 10, 9, 9);
+map[X][Y] = 2;
+queue.unshift([X, Y]);
+X+= x_dir[direction];
+Y+= y_dir[direction];
+if (frog < queue.length) 
+{
+dir = queue.pop()
+map[dir[0]][dir[1]] = 0;
+ctx.clearRect(dir[0] * 10, dir[1] * 10, 10, 10);
+}
+} 
+else if (!tn.length) 
+{
+var msg_score = document.getElementById("msg");
+msg_score.innerHTML = "Thank you for playing game.<br /> Your Score : <b>"+score+"</b><br /><br /><input type='button' value='Play Again' onclick='window.location.reload();' />";
+document.getElementById("playArea").style.display = 'none';
+window.clearInterval(interval);
+}
+}
+interval = window.setInterval(set_game_speed, level);
+document.onkeydown = function(e) {
+var code = e.keyCode - 37;
+if (0 <= code && code < 4 && code !== tn[0]) 
+{
+tn.unshift(code);
+} 
+else if (-5 == code) 
+{
+if (interval) 
+{
+window.clearInterval(interval);
+interval = 0;
+} 
+else 
+{
+interval = window.setInterval(set_game_speed, 60);
+}
+}
+else 
+{ 
+dir = sum + code;
+if (dir == 44||dir==94||dir==126||dir==171) {
+sum+= code
+} else if (dir === 218) easy = 1;
+}
+}
+}
+</script>
+</head>
+<body onload="play_game()">
+<h1>Play Snake Game</h1>
+<div id="msg"></div>
+<canvas id="playArea" width="450" height="300">Sorry your browser does not support HTML5</canvas>
 </body>
+</html>
